@@ -130,8 +130,19 @@ func autobuild() {
 	if n == -1 {
 		faygo.Fatalf("[fay] The project is not under src, can not run: %s", curpath)
 	}
+	gopath := os.Getenv("GOPATH")
+	curgopath := curpath[:n]
+	if gopath!="" {
+		if runtime.GOOS == "windows" {
+			gopath = curgopath + ";" + gopath
+		} else {
+			gopath = curgopath + ":" + gopath
+		}
+	} else {
+		gopath = curgopath
+	}
 	cmd := exec.Command("go", "build", "-o", appName)
-	cmd.Env = append([]string{"GOPATH=" + curpath[:n]}, os.Environ()...)
+	cmd.Env = append([]string{"GOPATH=" + gopath}, os.Environ()...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
